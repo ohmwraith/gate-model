@@ -416,6 +416,7 @@ namespace Printer {
 		for each (Car ^ cr in carList)
 		{
 			cr->update();
+			cr->p_neighbours = carList;
 			label10->Text = (cr->p_width).ToString();
 			if (time_->p_night && cr->p_target_Y == 600 && cr->p_posX == 740) {
 				cr->inactive();

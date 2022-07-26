@@ -78,7 +78,7 @@ public:
 	}
 	void send_car_leave_event(int provided_place) {
 		letCarLeave(provided_place);
-		places_array[provided_place] = true;
+		//places_array[provided_place] = true;
 
 	}
 	void release_places(int provided_place) {

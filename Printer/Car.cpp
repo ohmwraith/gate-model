@@ -7,6 +7,7 @@
 #include "Parking.cpp"
 
 using namespace System::Drawing;
+using namespace System::Collections::Generic;
 int getRandomNumber(int min, int max);
 
 ref class Car
@@ -21,6 +22,7 @@ protected:
 	Gate^ gate;
 	EcoGate^ ecogate;
 	Parking^ parking;
+	List <Car^>^ neighbours;
 	int car_id,queue;
 public:
 	//Делегат событий
@@ -80,9 +82,17 @@ public:
 		int get() { return queue; }
 		void set(int q) { queue = q; }
 	}
+	property int p_car_id {
+		int get() { return car_id; }
+	}
+	property List <Car^>^ p_neighbours {
+		List <Car^>^ get() { return neighbours; }
+		void set(List <Car^>^ crs) { neighbours = crs; }
+	}
 	//Конструктор и деструктор
 	Car(Gate^ gt, Parking^ park, EcoGate^ eco, int qu)
 	{	
+		neighbours = gcnew List<Car^>(0);
 		// Положение по осям
 		posX = 740;
 		posY = 1024;
@@ -159,18 +169,28 @@ public:
 	}
 	//Метод указывает машине двигаться через ворота
 	void go_throw_gate(int prov) {
+		/*
 		if (!provided_place_received && !leaving_car && posY == 600 && posX == 740 && gate->p_open) {
 			provided_place_received = true;
 			//Получили место для парковки и присваиваем ключевым точкам значение высоты парковки
 			provided_place = prov;
 			road_array_y[4] -= 25 + 100 * prov;
 			road_array_y[5] -= 25 + 100 * prov;
-			road_array_y[6] -= 25 + 100 * prov;
+			road_array_y[6] -= 25 + 100 * prov; 
 			speed_y = 15;
 			posY -= speed_y;
 			target_Y = goThrowGate_target;
 		}
 		else if (leaving_car) {
+			target_Y = 600;
+			speed_y = 15;
+		}*/
+		if (queue != -1) {
+			speed_y = 15;
+			posY -= speed_y;
+			target_Y = goThrowGate_target;
+		}
+		if (leaving_car) {
 			target_Y = 600;
 			speed_y = 15;
 		}
@@ -239,6 +259,27 @@ public:
 		} else if (!parked && go_to_park_frame >= 0){
 		// Условный оператор пути до парковки 
 			// Если достигли точки поворота, переключаемся на следущую
+			if (posX == 230){
+				if (posY % 100 == 0) {
+					bool echelon_busy = false;
+					for each (Car ^ cr in neighbours) {
+						if (cr->p_car_id != car_id) {
+							if (cr->p_posY == posY && abs(cr->p_posX - posX) < 150) {
+								echelon_busy = true;
+							}
+						}
+					}
+					if (echelon_busy) {
+						road_array_y[go_to_park_frame] -= 100;
+						target_Y = road_array_y[go_to_park_frame];
+					}
+					else {
+						road_array_y[go_to_park_frame + 1] = posY;
+						road_array_y[go_to_park_frame + 2] = posY;
+					}
+				}
+			}
+
 			if (posX == target_X && posY == target_Y) {
 				if (go_to_park_frame < 5) { go_to_park_frame++; rotate_needed = true; }
 			}
