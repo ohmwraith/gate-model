@@ -15,7 +15,7 @@ protected:
 public:
 	//Делегат событий шлагбаума
 	delegate void GateEventHandler();
-	delegate void GateOpenHandler(int provided_place);
+	delegate void GateOpenHandler();
 	//Событие шлагбаум открыт
 	static event GateOpenHandler^ openEvent;
 	//Событие шлагбаум закрыт
@@ -50,9 +50,9 @@ public:
 	};
 	~Gate() {};
 	//Метод открытия ворот
-	void open(int provide_place) {
+	void open() {
 		opened = true;
-		openEvent(provide_place);
+		openEvent();
 	}
 	//Метод закрытия ворот
 	void close() {

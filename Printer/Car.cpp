@@ -28,7 +28,7 @@ public:
 	//Делегат событий
 	delegate void CarEventHandler();
 	//Делегат событий освобождения мест
-	delegate void CarLeaveHandler(int provided_place);
+	delegate void CarLeaveHandler();
 	//Событие машина у ворот
 	static event CarEventHandler^ onGateEvent;
 	//Событие машина у ворот на выходе
@@ -165,10 +165,10 @@ public:
 	~Car() {};
 	void leave_park() {
 		leaving_car = true;
-		leaveDecision(provided_place);
+		leaveDecision();
 	}
 	//Метод указывает машине двигаться через ворота
-	void go_throw_gate(int prov) {
+	void go_throw_gate() {
 		/*
 		if (!provided_place_received && !leaving_car && posY == 600 && posX == 740 && gate->p_open) {
 			provided_place_received = true;
@@ -340,7 +340,7 @@ public:
 		if (posY == road_array_y[9] && posX == road_array_x[9] && !flagLeaveWaiting) {
 			flagLeaveWaiting = true;
 			go_from_park_frame = 10;
-			onLeavingGateEvent(provided_place);
+			onLeavingGateEvent();
 		}
 		//Если машина проехала через ворота
 		if (posY == 450 && posX == 740 && !flagAfterGate) {

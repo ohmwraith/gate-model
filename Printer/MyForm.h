@@ -387,7 +387,7 @@ namespace Printer {
 		time_ = gcnew Time(19, 00, 00);
 		gate = gcnew Gate();
 		ecogate = gcnew EcoGate();
-		parking = gcnew Parking(5, time_, gate);
+		parking = gcnew Parking(5, 5, time_, gate);
 		last_gate_opening = time_->tick - 1000;
 		//car = gcnew Car(gate, parking);
 		rand();
@@ -418,10 +418,12 @@ namespace Printer {
 			cr->update();
 			cr->p_neighbours = carList;
 			label10->Text = (cr->p_width).ToString();
-			if (time_->p_night && cr->p_target_Y == 600 && cr->p_posX == 740) {
-				cr->inactive();
-				cr->p_target_Y = 1500;
-				cr->p_speed_y = 15;
+		}
+		if (time_->p_night && gateQueueList->Count > 0) {
+			for each (Car ^ qcar in gateQueueList) {
+				qcar->inactive();
+				qcar->p_target_Y = 1500;
+				qcar->p_speed_y = 15;
 			}
 
 		}

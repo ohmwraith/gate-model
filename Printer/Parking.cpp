@@ -16,20 +16,19 @@ protected:
 	Gate^ gate;
 	Car^ car;
 	bool close;
-	int total;
+	int total, free;
 public:
 	//Делегат события парковки
-	delegate void ParkingEventHandler(int parking_number);
+	delegate void ParkingEventHandler();
 	//Событие машине разрешен въезд
 	static event ParkingEventHandler^ letCarIn;
 	static event ParkingEventHandler^ letCarLeave;
 	//Свойства
 	property bool p_avaliable {
 		bool get() {
-			for (int i = 0; i < places_array->Length; i++) {
-				if (places_array[i] == true) return places_array[i] * !time->p_night;
-			}
-			return false; 
+			bool answ;
+			free > 0 ? answ = true : answ = false;
+			return answ;
 		}
 	}
 	property int p_total {
@@ -37,30 +36,19 @@ public:
 		void set(int value) { total = value; }
 	}
 	property int p_free {
-		int get() { 
-			int count = 0;
-			for (int i = 1; i < places_array->Length; i++) {
-				if (places_array[i] == true) count++;
-			} return count;
-		}
+		int get() { return free; }
+		void set(int value) { free = value; }
 	}
 	property int p_occupied {
 		int get() { return total - p_free; }
 	}
-	property bool p_first {
-		bool get() {
-			return places_array[1];
-		}
-	}
 	//Конструктор и деструктор
-	Parking(int tot, Time^ t, Gate^ gt)
+	Parking(int tot, int fr, Time^ t, Gate^ gt)
 	{
 		total = tot;
 		time = t;
 		gate = gt;
-		places_array = gcnew array<bool>(total);
-		for (int i = 0; i < places_array->Length; i++) places_array[i] = true;
-		places_array[0] = false;
+		free = fr;
 		subscribe();
 	};
 	~Parking() {
@@ -70,18 +58,11 @@ public:
 	//Метод, вызывающий событие, разрешающее машине проехать
 	void send_car_enter_event() {
 		if (this->p_avaliable) {
-			int i = 0;
-			while (places_array[i] != true) i++;
-			letCarIn(i);
-			places_array[i] = false;
+			free--;
+			letCarIn();
 		}
 	}
-	void send_car_leave_event(int provided_place) {
-		letCarLeave(provided_place);
-		//places_array[provided_place] = true;
-
-	}
-	void release_places(int provided_place) {
-		
+	void send_car_leave_event() {
+		letCarLeave();
 	}
 };
