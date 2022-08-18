@@ -67,6 +67,10 @@ public:
 		int get() { return target_Y; }
 		void set(int value) { target_Y = value; }
 	}
+	property int p_target_X {
+		int get() { return target_X; }
+		void set(int value) { target_X = value; }
+	}
 	property int p_speed_x {
 		int get() { return speed_x; }
 		void set(int value) { speed_x = value; }
@@ -188,6 +192,9 @@ public:
 		if (queue != -1) {
 			speed_y = 15;
 			posY -= speed_y;
+			
+		}
+		if (queue == 0) {
 			target_Y = goThrowGate_target;
 		}
 		if (leaving_car) {

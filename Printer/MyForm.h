@@ -419,12 +419,13 @@ namespace Printer {
 			cr->p_neighbours = carList;
 			label10->Text = (cr->p_width).ToString();
 		}
+		//Обработка ночи
 		if (time_->p_night && gateQueueList->Count > 0) {
-			for each (Car ^ qcar in gateQueueList) {
-				qcar->inactive();
-				qcar->p_target_Y = 1500;
-				qcar->p_speed_y = 15;
-			}
+			gateQueueList[0]->inactive();
+			gateQueueList[0]->p_target_X = 740;
+			gateQueueList[0]->p_target_Y = 1500;
+			gateQueueList[0]->p_speed_y = 15;
+			gateQueueList->Remove(gateQueueList[0]);
 
 		}
 
@@ -440,6 +441,7 @@ namespace Printer {
 			if (ecogate_timing == 0) ecogate_timing = time_->hours_P * 60 + time_->minutes_P;
 			else if ((time_->hours_P * 60 + time_->minutes_P) - ecogate_timing > 5) { ecogate->close(); ecogate_timing = 0; }
 		}*/
+		// Отображение информации объектов
 		total_textbox->Text = (parking->p_total).ToString();
 		free_textbox->Text = (parking->p_free).ToString();
 		label9->Text = (gateQueueList->Count).ToString();
@@ -459,6 +461,10 @@ namespace Printer {
 		if (gateQueueList->Count >= 4) {
 			label13->Text = (gateQueueList[3]->p_queue).ToString();
 			label13->Location = System::Drawing::Point(gateQueueList[3]->p_posX, gateQueueList[3]->p_posY);
+		}
+		for each (Car ^ ctpr in carList) {
+			label12->Text = (ctpr->p_target_Y).ToString();
+			label12->Location = System::Drawing::Point(ctpr->p_posX, ctpr->p_posY + 100);
 		}
 		//time_->tick - last_gate_opening > 0.3
 		for each (Car ^ ctr in carList) {
