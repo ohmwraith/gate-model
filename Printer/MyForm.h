@@ -11,6 +11,7 @@
 #pragma comment (lib, "Advapi32.lib")
 #pragma comment (lib, "user32.lib")
 
+//Функция генерации случайного числа
 int getRandomNumber(int min, int max)
 {
 	static const double fraction = 1.0 / (static_cast<double>(RAND_MAX) + 1.0);
@@ -44,14 +45,8 @@ namespace Printer {
 		List <Car^>^ carList;
 		List <Car^>^ gateQueueList;
 		int lastCarMinutes = 0, ecogate_timing = 0, last_gate_opening = 0;
-	//	SignalConst^ signAvt;
 	private: System::Windows::Forms::Label^ label1;
 	private: System::Windows::Forms::Label^ label2;
-
-
-
-
-
 	private: System::Windows::Forms::Label^ label4;
 	private: System::Windows::Forms::Label^ label5;
 	private: System::Windows::Forms::TextBox^ total_textbox;
@@ -66,26 +61,13 @@ namespace Printer {
 	private: System::Windows::Forms::Label^ label13;
 	private: System::Windows::Forms::Label^ label7;
 
-
-
-
-
-
-
-
-
-
-
 	public:
 		MyForm(void)
 		{
-			//car_image = gcnew Bitmap(".\\assets\\car_white.png");
+			// Создание массивов машин
 			carList = gcnew List<Car^>(0);
 			gateQueueList = gcnew List<Car^>(0);
 			InitializeComponent();
-			//
-			//TODO: добавьте код конструктора
-			//
 		}
 
 	protected:
@@ -381,6 +363,7 @@ namespace Printer {
 		}
 #pragma endregion
 	private: System::Void MyForm_Load(System::Object^ sender, System::EventArgs^ e) {
+		//Настройка генератора случайных значений
 		srand(time(0));
 		rand();
 		//Инициализация и запуск
@@ -388,31 +371,36 @@ namespace Printer {
 		gate = gcnew Gate();
 		ecogate = gcnew EcoGate();
 		parking = gcnew Parking(5, 5, time_, gate);
+		// Счетчик времени открытия ворот
 		last_gate_opening = time_->tick - 1000;
-		//car = gcnew Car(gate, parking);
 		rand();
+		// Запуск таймера
 		timer1 -> Interval = 500;
 		timer1 -> Start();
 	}
 	private: System::Void timer1_Tick(System::Object^ sender, System::EventArgs^ e) {
+		
 		time_->Update();
 		if (time_->hours_P == 0 && time_->minutes_P == 0 && time_->seconds_P == 0) lastCarMinutes = 0;
+		// Создание машин с шансом
 		if (getRandomNumber(1, 100) > 1)
 		{	
 			if (gateQueueList->Count < 4 && carList->Count < 8 && !time_->p_night && (time_->hours_P * 60) % 24 * 60 + time_->minutes_P - lastCarMinutes > 5)
-			{
+			{	
 				lastCarMinutes = (time_->hours_P * 60) % 24 * 60 + time_->minutes_P;
 				Car^ cr = gcnew Car(gate, parking, ecogate, gateQueueList->Count);
 				carList->Add(cr);
 				gateQueueList->Add(cr);
 			}
 		}
+		// Побуждение машины уехать с парковки
 		if (getRandomNumber(1, 100) > 98)
 		{
 			if (carList->Count > 0 && carList[0]->p_parked) {
 				carList[0]->leave_park();
 			}
 		}
+		// Передача списка машин в экземпляры машин
 		for each (Car ^ cr in carList)
 		{
 			cr->update();
@@ -421,14 +409,16 @@ namespace Printer {
 		}
 		//Обработка ночи
 		if (time_->p_night && gateQueueList->Count > 0) {
-			gateQueueList[0]->inactive();
-			gateQueueList[0]->p_target_X = 740;
-			gateQueueList[0]->p_target_Y = 1500;
-			gateQueueList[0]->p_speed_y = 15;
-			gateQueueList->Remove(gateQueueList[0]);
+			for (int i = gateQueueList->Count - 1; i >= 0; i--) {
+				gateQueueList[i]->inactive();
+				gateQueueList[i]->p_target_X = 740;
+				gateQueueList[i]->p_target_Y = 1500;
+				gateQueueList[i]->p_speed_y = 15;
+				gateQueueList->Remove(gateQueueList[i]);
+			}
 
 		}
-
+		// Удаление машин за краем экрана
 		for (int i = 0; i < carList -> Count; i++)
 		{
 			if (carList[i]->p_posY < -400 || carList[i]->p_posY > 1024)
@@ -437,10 +427,14 @@ namespace Printer {
 				carList -> RemoveAt(i);
 			}
 		}
-		/*if (ecogate->p_open) {
-			if (ecogate_timing == 0) ecogate_timing = time_->hours_P * 60 + time_->minutes_P;
-			else if ((time_->hours_P * 60 + time_->minutes_P) - ecogate_timing > 5) { ecogate->close(); ecogate_timing = 0; }
-		}*/
+		for (int i = 0; i < gateQueueList->Count; i++) {
+			if (gateQueueList[i]->p_posY < -400 || gateQueueList[i]->p_posY > 1024)
+			{
+				delete gateQueueList[i];
+				gateQueueList->RemoveAt(i);
+			}
+		}
+
 		// Отображение информации объектов
 		total_textbox->Text = (parking->p_total).ToString();
 		free_textbox->Text = (parking->p_free).ToString();

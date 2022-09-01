@@ -13,7 +13,8 @@ int getRandomNumber(int min, int max);
 ref class Car
 {
 protected:
-	bool flagOnGate = false, flagAfterGate = false, rotate_needed = true, provided_place_received = false, leaving_car = false, parked = false, flagLeaveWaiting = false;
+	// Объявление и инициализация переменных
+	bool flagOnGate = false, flagAfterGate = false, rotate_needed = true, inactive_status = false, provided_place_received = false, leaving_car = false, parked = false, flagLeaveWaiting = false;
 	int posX, posY, scale, width, height, speed_y, speed_x, random_color_id;
 	int goToGate_target, goThrowGate_target, goToPark_target, status, target_X, target_Y, go_to_park_frame, go_from_park_frame, provided_place;
 	array<int>^ road_array_x;
@@ -112,6 +113,7 @@ public:
 		speed_y = 15;
 		speed_x = 0;
 		queue = qu;
+		// Ключевые точки
 		goToGate_target = 600;
 		goThrowGate_target = 450;
 		target_Y = goToGate_target + 100 * queue;
@@ -162,6 +164,7 @@ public:
 		else if (random_color_id == 1) image = gcnew Bitmap(".\\assets\\car_white.png");
 		else if (random_color_id == 2) image = gcnew Bitmap(".\\assets\\car_blue.png");
 		else if (random_color_id == 3) image = gcnew Bitmap(".\\assets\\car_yellow.png");
+		//Подписка на события
 		gate->openEvent += gcnew Gate::GateOpenHandler(this, &Car::go_throw_gate);
 		ecogate->openGateForLeaving += gcnew EcoGate::EcoGateEventHandler(this, &Car::go_throw_leaving_gate);
 		//gate->closeEvent += gcnew Gate::GateEventHandler(this, &Car::go_to_gate);
@@ -173,28 +176,13 @@ public:
 	}
 	//Метод указывает машине двигаться через ворота
 	void go_throw_gate() {
-		/*
-		if (!provided_place_received && !leaving_car && posY == 600 && posX == 740 && gate->p_open) {
-			provided_place_received = true;
-			//Получили место для парковки и присваиваем ключевым точкам значение высоты парковки
-			provided_place = prov;
-			road_array_y[4] -= 25 + 100 * prov;
-			road_array_y[5] -= 25 + 100 * prov;
-			road_array_y[6] -= 25 + 100 * prov; 
-			speed_y = 15;
-			posY -= speed_y;
-			target_Y = goThrowGate_target;
-		}
-		else if (leaving_car) {
-			target_Y = 600;
-			speed_y = 15;
-		}*/
+
 		if (queue != -1) {
 			speed_y = 15;
 			posY -= speed_y;
 			
 		}
-		if (queue == 0) {
+		if (queue == 0 && !inactive_status) {
 			target_Y = goThrowGate_target;
 		}
 		if (leaving_car) {
@@ -217,7 +205,9 @@ public:
 		go_from_park_frame = 10;
 		go_to_park_frame = 10;
 		leaving_car;
+		inactive_status = true;
 	}
+	// Метод смещения в очереди
 	void queue_step() {
 		if (queue >= 0) {
 			target_Y = goToGate_target + 100 * queue;
@@ -286,7 +276,7 @@ public:
 					}
 				}
 			}
-
+			// Если ключевая точка достигнута, переключить на следующую
 			if (posX == target_X && posY == target_Y) {
 				if (go_to_park_frame < 5) { go_to_park_frame++; rotate_needed = true; }
 			}
@@ -324,7 +314,6 @@ public:
 				else if (go_to_park_frame == 5) {
 					image->RotateFlip(RotateFlipType::Rotate90FlipNone);
 					swap_resolution();
-					rotate_needed = false;
 					parked = true;
 					go_to_park_frame = 10;
 					rotate_needed = true;
@@ -332,10 +321,17 @@ public:
 			}
 		}
 		//Если машина у ворот
-		if (posY == 600 && posX == 740 && !provided_place_received) {
+		if (posY == 600 && posX == 740 && !flagOnGate) {
 			flagOnGate = true;
 			speed_y = 0;
 			onGateEvent();
+		}
+		//Если машина проехала через ворота
+		if (posY == 450 && posX == 740 && !flagAfterGate) {
+			flagAfterGate = true;
+			freeGateEvent();
+			go_to_park_frame = 0;
+			//target_Y = goToPark_target;
 		}
 		// Если машина проехала шлагбаум на выезде
 		if (posY == 600 && posX == 900) {
@@ -349,13 +345,7 @@ public:
 			go_from_park_frame = 10;
 			onLeavingGateEvent();
 		}
-		//Если машина проехала через ворота
-		if (posY == 450 && posX == 740 && !flagAfterGate) {
-			flagAfterGate = true;
-			freeGateEvent();
-			go_to_park_frame = 0;
-			//target_Y = goToPark_target;
-		}
+
 
 
 		//Перемещение машины ниже
