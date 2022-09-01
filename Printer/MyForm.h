@@ -247,6 +247,7 @@ namespace Printer {
 			this->label6->Size = System::Drawing::Size(70, 25);
 			this->label6->TabIndex = 12;
 			this->label6->Text = L"label6";
+			this->label6->Visible = false;
 			// 
 			// label7
 			// 
@@ -258,6 +259,7 @@ namespace Printer {
 			this->label7->Size = System::Drawing::Size(70, 25);
 			this->label7->TabIndex = 13;
 			this->label7->Text = L"label7";
+			this->label7->Visible = false;
 			// 
 			// label8
 			// 
@@ -282,6 +284,7 @@ namespace Printer {
 			this->label9->Size = System::Drawing::Size(70, 25);
 			this->label9->TabIndex = 15;
 			this->label9->Text = L"label9";
+			this->label9->Visible = false;
 			// 
 			// label10
 			// 
@@ -293,6 +296,7 @@ namespace Printer {
 			this->label10->Size = System::Drawing::Size(82, 25);
 			this->label10->TabIndex = 16;
 			this->label10->Text = L"label10";
+			this->label10->Visible = false;
 			// 
 			// label11
 			// 
@@ -304,6 +308,7 @@ namespace Printer {
 			this->label11->Size = System::Drawing::Size(82, 25);
 			this->label11->TabIndex = 17;
 			this->label11->Text = L"label11";
+			this->label11->Visible = false;
 			// 
 			// label12
 			// 
@@ -315,6 +320,7 @@ namespace Printer {
 			this->label12->Size = System::Drawing::Size(82, 25);
 			this->label12->TabIndex = 18;
 			this->label12->Text = L"label12";
+			this->label12->Visible = false;
 			// 
 			// label13
 			// 
@@ -326,6 +332,7 @@ namespace Printer {
 			this->label13->Size = System::Drawing::Size(82, 25);
 			this->label13->TabIndex = 19;
 			this->label13->Text = L"label13";
+			this->label13->Visible = false;
 			// 
 			// MyForm
 			// 
@@ -383,12 +390,13 @@ namespace Printer {
 		time_->Update();
 		if (time_->hours_P == 0 && time_->minutes_P == 0 && time_->seconds_P == 0) lastCarMinutes = 0;
 		// Создание машин с шансом
+		label13->Text = ((time_->hours_P * 60 + time_->minutes_P) - lastCarMinutes > 5).ToString();
 		if (getRandomNumber(1, 100) > 1)
 		{	
-			if (gateQueueList->Count < 4 && carList->Count < 8 && !time_->p_night && (time_->hours_P * 60) % 24 * 60 + time_->minutes_P - lastCarMinutes > 5)
+			if (gateQueueList->Count < 4 && carList->Count < 8 && !time_->p_night && (time_->hours_P * 60 + time_->minutes_P) - lastCarMinutes > 5)
 			{	
-				lastCarMinutes = (time_->hours_P * 60) % 24 * 60 + time_->minutes_P;
-				Car^ cr = gcnew Car(gate, parking, ecogate, gateQueueList->Count);
+				lastCarMinutes = time_->hours_P * 60 + time_->minutes_P;
+				Car^ cr = gcnew Car(gate, parking, ecogate, gateQueueList->Count, time_);
 				carList->Add(cr);
 				gateQueueList->Add(cr);
 			}

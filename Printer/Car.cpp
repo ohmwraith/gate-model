@@ -16,7 +16,7 @@ protected:
 	// Объявление и инициализация переменных
 	bool flagOnGate = false, flagAfterGate = false, rotate_needed = true, inactive_status = false, provided_place_received = false, leaving_car = false, parked = false, flagLeaveWaiting = false;
 	int posX, posY, scale, width, height, speed_y, speed_x, random_color_id;
-	int goToGate_target, goThrowGate_target, goToPark_target, status, target_X, target_Y, go_to_park_frame, go_from_park_frame, provided_place;
+	int goToGate_target, goThrowGate_target, goToPark_target, status, target_X, target_Y, go_to_park_frame, go_from_park_frame, provided_place, last_on_gate_req;
 	array<int>^ road_array_x;
 	array<int>^ road_array_y;
 	Bitmap^ image;
@@ -24,6 +24,7 @@ protected:
 	EcoGate^ ecogate;
 	Parking^ parking;
 	List <Car^>^ neighbours;
+	Time^ time_;
 	int car_id,queue;
 public:
 	//Делегат событий
@@ -95,7 +96,7 @@ public:
 		void set(List <Car^>^ crs) { neighbours = crs; }
 	}
 	//Конструктор и деструктор
-	Car(Gate^ gt, Parking^ park, EcoGate^ eco, int qu)
+	Car(Gate^ gt, Parking^ park, EcoGate^ eco, int qu, Time^ tm)
 	{	
 		neighbours = gcnew List<Car^>(0);
 		// Положение по осям
@@ -126,7 +127,9 @@ public:
 		parking = park;
 		ecogate = eco;
 		gate = gt;
+		time_ = tm;
 		status = 0;
+		last_on_gate_req = time_->tick - 1000;
 
 
 		// Переданное место для парковки, изначально равно -1
@@ -191,7 +194,10 @@ public:
 		}
 	}
 	void go_throw_leaving_gate() {
-
+		if (leaving_car) {
+			target_Y = 600;
+			speed_y = 15;
+		}
 	}
 	// Метод, меняющий местами значения ширины и высоты, нужен для разворота картинки
 	void swap_resolution() {
@@ -321,10 +327,12 @@ public:
 			}
 		}
 		//Если машина у ворот
-		if (posY == 600 && posX == 740 && !flagOnGate) {
-			flagOnGate = true;
-			speed_y = 0;
-			onGateEvent();
+		if (posY == 600 && posX == 740) {
+			if (!flagOnGate){
+				flagOnGate = true;
+				speed_y = 0;
+			}
+			else if (time_->tick - last_on_gate_req > 1000) onGateEvent();
 		}
 		//Если машина проехала через ворота
 		if (posY == 450 && posX == 740 && !flagAfterGate) {
@@ -337,7 +345,7 @@ public:
 		if (posY == 600 && posX == 900) {
 			target_Y = 1025;
 			speed_y = 15;
-			freeGateEvent();
+			freeLeavingGateEvent();
 		}
 		// Если машина у шлагбаума на выезде
 		if (posY == road_array_y[9] && posX == road_array_x[9] && !flagLeaveWaiting) {

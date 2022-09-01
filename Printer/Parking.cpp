@@ -63,7 +63,7 @@ public:
 		}
 	}
 	void send_car_leave_event() {
-		//free++;
+		free++;
 		letCarLeave();
 	}
 };

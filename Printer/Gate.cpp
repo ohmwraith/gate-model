@@ -63,7 +63,7 @@ public:
 		opened ? opened = false : opened = true;
 	}
 	//Метод обновления состояния объекта
-	public: void update()
+	void update()
 	{
 		if (opened) image = gate_opened_image;
 		else image = gate_closed_image;

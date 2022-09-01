@@ -127,11 +127,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Car.cpp" />
-    <ClCompile Include="CarReverse.cpp" />
     <ClCompile Include="EcoGate.cpp" />
     <ClCompile Include="Gate.cpp" />
     <ClCompile Include="Parking.cpp" />
     <ClCompile Include="MyForm.cpp" />
+    <ClCompile Include="subEcoGate.cpp" />
     <ClCompile Include="SubGate.cpp" />
     <ClCompile Include="SubParking.cpp" />
     <ClCompile Include="Time.cpp" />
