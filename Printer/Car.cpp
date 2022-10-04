@@ -27,9 +27,9 @@ protected:
 	Time^ time_;
 	int car_id,queue;
 public:
-	//Делегат событий
+	//Делегат событий въезда машины
 	delegate void CarEventHandler();
-	//Делегат событий освобождения мест
+	//Делегат событий отъезда с парковки
 	delegate void CarLeaveHandler();
 	//Событие машина у ворот
 	static event CarEventHandler^ onGateEvent;
@@ -38,8 +38,7 @@ public:
 	//Событие машина проехала в ворота
 	static event CarEventHandler^ freeGateEvent;
 	//Событие машина проехала в ворота на выходе
-	static event CarEventHandler^ freeLeavingGateEvent;
-	static event CarLeaveHandler^ leaveDecision;
+	static event CarLeaveHandler^ freeLeavingGateEvent;
 	//Свойства
 	property Bitmap^ p_image {
 		Bitmap^ get() { return image; }
@@ -168,14 +167,12 @@ public:
 		else if (random_color_id == 2) image = gcnew Bitmap(".\\assets\\car_blue.png");
 		else if (random_color_id == 3) image = gcnew Bitmap(".\\assets\\car_yellow.png");
 		//Подписка на события
-		gate->openEvent += gcnew Gate::GateOpenHandler(this, &Car::go_throw_gate);
+		gate->openEvent += gcnew Gate::GateEventHandler(this, &Car::go_throw_gate);
 		ecogate->openGateForLeaving += gcnew EcoGate::EcoGateEventHandler(this, &Car::go_throw_leaving_gate);
-		//gate->closeEvent += gcnew Gate::GateEventHandler(this, &Car::go_to_gate);
 	};
 	~Car() {};
 	void leave_park() {
 		leaving_car = true;
-		leaveDecision();
 	}
 	//Метод указывает машине двигаться через ворота
 	void go_throw_gate() {
@@ -332,7 +329,8 @@ public:
 				flagOnGate = true;
 				speed_y = 0;
 			}
-			else if (time_->tick - last_on_gate_req > 1000) onGateEvent();
+			else onGateEvent(); 
+			//Передается в parking и вызывает метод send_car_enter_event
 		}
 		//Если машина проехала через ворота
 		if (posY == 450 && posX == 740 && !flagAfterGate) {

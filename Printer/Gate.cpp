@@ -15,9 +15,8 @@ protected:
 public:
 	//Делегат событий шлагбаума
 	delegate void GateEventHandler();
-	delegate void GateOpenHandler();
 	//Событие шлагбаум открыт
-	static event GateOpenHandler^ openEvent;
+	static event GateEventHandler^ openEvent;
 	//Событие шлагбаум закрыт
 	static event GateEventHandler^ closeEvent;
 	//Свойства
@@ -53,6 +52,7 @@ public:
 	void open() {
 		opened = true;
 		openEvent();
+		//Передается в машину, вызывает метод go_throw_gate()
 	}
 	//Метод закрытия ворот
 	void close() {

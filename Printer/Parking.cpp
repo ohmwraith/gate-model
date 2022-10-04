@@ -51,19 +51,19 @@ public:
 		free = fr;
 		subscribe();
 	};
-	~Parking() {
-		this->letCarIn -= gcnew Parking::ParkingEventHandler(gate, &Gate::open);
-	};
+	~Parking() {};
 	void subscribe();
 	//Метод, вызывающий событие, разрешающее машине проехать
 	void send_car_enter_event() {
 		if (this->p_avaliable) {
 			free--;
 			letCarIn();
+			//Передается в ворота, вызывает метод open()
 		}
 	}
 	void send_car_leave_event() {
 		free++;
 		letCarLeave();
+		//Передается в эковорота, вызывает метод open()
 	}
 };

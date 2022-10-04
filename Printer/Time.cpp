@@ -10,9 +10,7 @@ private:
     int hours, minutes, seconds;
     bool night;
 public:
-    //Делегат для события час, подписан Parking;
-    delegate void TimeEventHandler();
-    static event TimeEventHandler^ CHAS;
+
     //Конструктор и деструктор
     Time(int xInput, int yInput, int zInput)
     {
@@ -55,10 +53,7 @@ public:
         {
             hours += 1;
             minutes = minutes - 60;
-            if (hours >= 4 && hours < 21)
-            {
-                CHAS();
-            }     
+
         }
         if (hours >= 24)
         {
