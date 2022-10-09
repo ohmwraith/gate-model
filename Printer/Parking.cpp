@@ -4,6 +4,7 @@
 #include <iostream>
 #include "Time.cpp"
 #include "Gate.cpp"
+#include "Car.cpp"
 
 using namespace System::Drawing;
 ref class Gate;
@@ -49,16 +50,17 @@ public:
 		time = t;
 		gate = gt;
 		free = fr;
-		subscribe();
+		car->onGateEvent += gcnew Car::CarEventHandler(this, &Parking::send_car_enter_event);
+		car->onLeavingGateEvent += gcnew Car::CarLeaveHandler(this, &Parking::send_car_leave_event);
 	};
 	~Parking() {};
-	void subscribe();
 	//Метод, вызывающий событие, разрешающее машине проехать
 	void send_car_enter_event() {
 		if (this->p_avaliable) {
 			free--;
 			letCarIn();
 			//Передается в ворота, вызывает метод open()
+
 		}
 	}
 	void send_car_leave_event() {

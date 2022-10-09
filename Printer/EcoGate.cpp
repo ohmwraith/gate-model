@@ -1,5 +1,6 @@
 #include "Gate.cpp"
 #include "Parking.cpp"
+#include "Car.cpp"
 
 ref class EcoGate : public Gate 
 {
@@ -8,7 +9,6 @@ public:
 	bool eco_opened;
 	delegate void EcoGateEventHandler();
 	static event EcoGateEventHandler^ openGateForLeaving;
-	void subscribe();
 	EcoGate()
 	{
 		posX = 850;
@@ -19,7 +19,7 @@ public:
 		image = gate_closed_image;
 		parking->letCarLeave += gcnew Parking::ParkingEventHandler(this, &EcoGate::open);
 		parking->letCarIn -= gcnew Parking::ParkingEventHandler(this, &EcoGate::open);
-		subscribe();
+		car->freeLeavingGateEvent += gcnew Car::CarLeaveHandler(this, &EcoGate::close);
 	};
 	~EcoGate() {};
 	void open() {

@@ -1,6 +1,8 @@
 // Класс шлагбаума
 #pragma once
 #include <iostream>
+#include "Car.cpp"
+#include "Parking.cpp"
 using namespace System::Drawing;
 ref class Car;
 ref class Parking;
@@ -36,7 +38,6 @@ public:
 		bool get() { return opened; }
 		void set(bool value) { opened = value; }
 	}
-	void subscribe();
 	//Конструктор и деструктор
 	Gate()
 	{
@@ -45,7 +46,8 @@ public:
 		opened = false;
 		gate_closed_image = gcnew Bitmap(".\\assets\\gate_closed.png");
 		gate_opened_image = gcnew Bitmap(".\\assets\\gate_opened.png");
-		subscribe();
+		car->freeGateEvent += gcnew Car::CarEventHandler(this, &Gate::close);
+		parking->letCarIn += gcnew Parking::ParkingEventHandler(this, &Gate::open);
 	};
 	~Gate() {};
 	//Метод открытия ворот
