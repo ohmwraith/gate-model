@@ -217,6 +217,10 @@ public:
 			speed_y = 15;
 		}
 	}
+	void park_this_car() {
+		road_array_y[go_to_park_frame + 1] = posY;
+		road_array_y[go_to_park_frame + 2] = posY;
+	}
 	//Обновление данных объекта
 	public: void update()
 	{	
@@ -274,8 +278,7 @@ public:
 						target_Y = road_array_y[go_to_park_frame];
 					}
 					else {
-						road_array_y[go_to_park_frame + 1] = posY;
-						road_array_y[go_to_park_frame + 2] = posY;
+						park_this_car();
 					}
 				}
 			}
